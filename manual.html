@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dmReplace 使用手冊</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --surface: #ffffff; --text: #1f2328; --muted: #5d636b;
+    --border: #dfe1e4; --accent: #1f6feb; --accent-soft: #e8f0fe; --code-bg: #f0f1f3;
+    --ok: #1a7f37; --warn: #9a6700;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #15171a; --surface: #1d2024; --text: #e6e8eb; --muted: #9aa1a9;
+      --border: #30353b; --accent: #6ea8fe; --accent-soft: #1c2a40; --code-bg: #262a30;
+      --ok: #56d364; --warn: #e3b341;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #15171a; --surface: #1d2024; --text: #e6e8eb; --muted: #9aa1a9;
+    --border: #30353b; --accent: #6ea8fe; --accent-soft: #1c2a40; --code-bg: #262a30;
+    --ok: #56d364; --warn: #e3b341;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.7 system-ui, "Microsoft JhengHei UI", "PingFang TC", sans-serif;
+  }
+  main { max-width: 820px; margin: 0 auto; padding: 48px 16px 80px; }
+  header { margin-bottom: 40px; }
+  header h1 { font-size: 2rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+  header p { margin: 0; color: var(--muted); }
+  nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+  nav a {
+    font-size: 0.875rem; padding: 4px 12px; border: 1px solid var(--border);
+    border-radius: 999px; color: var(--text); text-decoration: none; background: var(--surface);
+  }
+  nav a:hover { border-color: var(--accent); color: var(--accent); }
+  h2 { font-size: 1.3rem; margin: 48px 0 12px; padding-top: 8px; border-top: 1px solid var(--border); }
+  h3 { font-size: 1.05rem; margin: 28px 0 8px; }
+  a { color: var(--accent); }
+  code, kbd {
+    font: 0.875em ui-monospace, "Cascadia Code", Consolas, monospace;
+    background: var(--code-bg); padding: 1px 6px; border-radius: 4px;
+  }
+  kbd { border: 1px solid var(--border); border-bottom-width: 2px; }
+  pre {
+    background: var(--code-bg); padding: 14px 16px; border-radius: 8px; overflow-x: auto;
+    font: 0.875rem/1.6 ui-monospace, "Cascadia Code", Consolas, monospace;
+  }
+  pre code { background: none; padding: 0; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 8px; overflow: hidden; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { font-size: 0.85rem; color: var(--muted); font-weight: 600; background: var(--code-bg); }
+  tr:last-child td { border-bottom: 0; }
+  ol, ul { padding-left: 1.4em; }
+  li { margin: 4px 0; }
+  .note {
+    background: var(--accent-soft); border-left: 3px solid var(--accent);
+    padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 16px 0;
+  }
+  .ok { color: var(--ok); font-weight: 600; }
+  .warn { color: var(--warn); font-weight: 600; }
+  footer { margin-top: 64px; color: var(--muted); font-size: 0.85rem; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>dmReplace</h1>
+    <p>一鍵把剪貼簿裡的 X／Twitter、Instagram、Threads 連結換成能在聊天軟體正常預覽的網址。</p>
+    <nav>
+      <a href="#start">開始使用</a>
+      <a href="#rules">轉換規則</a>
+      <a href="#toast">提示訊息</a>
+      <a href="#tips">使用技巧</a>
+      <a href="#build">從原始碼建置</a>
+      <a href="#faq">常見問題</a>
+    </nav>
+  </header>
+
+  <section id="start">
+    <h2>開始使用</h2>
+    <ol>
+      <li>在瀏覽器或 App 裡複製貼文連結（或一整段含連結的文字）。</li>
+      <li>執行 <code>dmReplace.exe</code>。</li>
+      <li>畫面上方中央會出現提示，剪貼簿內容已被替換，直接貼上即可。</li>
+    </ol>
+    <p>程式沒有視窗、不會常駐：讀取剪貼簿、轉換、顯示提示，約 2 秒後自動結束。提示不會搶走焦點，滑鼠也能穿透。</p>
+  </section>
+
+  <section id="rules">
+    <h2>轉換規則</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>原始網域</th><th>替換為</th></tr></thead>
+        <tbody>
+          <tr><td><code>twitter.com</code></td><td><code>fxtwitter.com</code></td></tr>
+          <tr><td><code>x.com</code></td><td><code>fxtwitter.com</code></td></tr>
+          <tr><td><code>instagram.com</code></td><td><code>kkinstagram.com</code></td></tr>
+          <tr><td><code>threads.com</code></td><td><code>fixthreads.seria.moe</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>細節</h3>
+    <ul>
+      <li>只替換網域，路徑與參數保持不變；<code>https://</code> 會保留，<code>www.</code> 會被拿掉。</li>
+      <li>大小寫不拘，一段文字裡有多個連結會一次全部替換。</li>
+      <li>連結緊接在中文字後面（例如 <code>看這個x.com/abc</code>）也能正確辨識。</li>
+    </ul>
+
+    <h3>範例</h3>
+<pre><code>https://x.com/user/status/123        → https://fxtwitter.com/user/status/123
+https://www.instagram.com/p/AbC/     → https://kkinstagram.com/p/AbC/
+threads.com/@user/post/xyz           → fixthreads.seria.moe/@user/post/xyz</code></pre>
+
+    <h3>不會被替換的情況</h3>
+    <p>網域必須獨立出現，以下這些會保持原樣，避免誤傷：</p>
+<pre><code>netflix.com          （x.com 只是字尾）
+foo@x.com            （電子郵件）
+sub.x.com            （子網域）
+x.com.tw             （其他網域）
+example.com/x.com    （出現在別的網址路徑裡）</code></pre>
+  </section>
+
+  <section id="toast">
+    <h2>提示訊息</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>訊息</th><th>意思</th></tr></thead>
+        <tbody>
+          <tr><td class="ok">已轉換為 fxtwitter.com</td><td>轉換成功，列出這次用到的替換網域。</td></tr>
+          <tr><td class="warn">未找到轉換目標</td><td>剪貼簿裡沒有符合規則的連結，內容沒有變動。</td></tr>
+          <tr><td class="warn">無法存取剪貼簿</td><td>其他程式長時間占用剪貼簿（程式會重試約 1 秒）。稍後再執行一次即可。</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>連續執行時，舊的提示會立刻被新的取代，不會疊在一起。</p>
+  </section>
+
+  <section id="tips">
+    <h2>使用技巧</h2>
+    <p>因為每次都要執行一次，放在順手的地方最方便：</p>
+    <ul>
+      <li><strong>釘選到工作列</strong>：在 exe 上按右鍵 → 「釘選到工作列」。之後按 <kbd>Win</kbd> + <kbd>數字</kbd> 也能啟動（數字是它在工作列上的位置）。</li>
+      <li><strong>設定快速鍵</strong>：建立捷徑放到桌面或「開始」功能表，在捷徑內容的「快速鍵」欄位設定一組按鍵（例如 <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>D</kbd>）。</li>
+    </ul>
+  </section>
+
+  <section id="build">
+    <h2>從原始碼建置</h2>
+    <p>只需要 Windows 內建的 .NET Framework 4.x，不必安裝 Visual Studio。</p>
+<pre><code>build.cmd</code></pre>
+    <p>腳本會使用 <code>%WINDIR%\Microsoft.NET\Framework64\v4.0.30319\csc.exe</code> 編譯，輸出 <code>dmReplace.exe</code>。若資料夾中沒有 <code>dmReplace.ico</code>，會先以 <code>tools\MakeIcon.cs</code> 產生圖示。</p>
+
+    <h3>檔案結構</h3>
+<pre><code>Program.cs         進入點、剪貼簿讀寫、提示視窗
+Converter.cs       網域替換規則
+tools/MakeIcon.cs  圖示產生器
+build.cmd          建置腳本</code></pre>
+
+    <div class="note">要新增或修改替換規則，編輯 <code>Converter.cs</code> 裡的 <code>Targets</code> 對照表，並把新網域加進 <code>HostPattern</code> 的 <code>host</code> 群組，然後重新執行 <code>build.cmd</code>。</div>
+  </section>
+
+  <section id="faq">
+    <h2>常見問題</h2>
+    <h3>剪貼簿是圖片或檔案時會怎樣？</h3>
+    <p>只處理純文字。剪貼簿不是文字時會顯示「未找到轉換目標」，原內容不受影響。</p>
+    <h3>會把我的連結送到網路上嗎？</h3>
+    <p>不會。dmReplace 完全在本機做字串替換，不連網。替換後的網址是由第三方預覽服務（fxtwitter 等）提供，對方在你或聊天對象開啟連結時才會收到請求。</p>
+    <h3>替換後的網址打不開？</h3>
+    <p>這些是第三方服務，偶爾會暫停或更換網域。可以改 <code>Converter.cs</code> 指向其他服務後重新建置。</p>
+  </section>
+
+  <footer>dmReplace · Windows · .NET Framework 4</footer>
+</main>
+</body>
+</html>
